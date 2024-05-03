@@ -5639,6 +5639,8 @@ func TestOneOfValidation(t *testing.T) {
 		{f: uint16(6), t: "oneof=5 6"},
 		{f: uint32(6), t: "oneof=5 6"},
 		{f: uint64(6), t: "oneof=5 6"},
+		{f: map[string]int{"a": 1, "b": 1}, t: "oneof=a b"},
+		{f: []string{"a", "b"}, t: "oneof=a b"},
 	}
 
 	for _, spec := range passSpecs {
@@ -5667,6 +5669,8 @@ func TestOneOfValidation(t *testing.T) {
 		{f: uint16(5), t: "oneof=red green"},
 		{f: uint32(5), t: "oneof=red green"},
 		{f: uint64(5), t: "oneof=red green"},
+		{f: map[string]int{"a": 1, "b": 2}, t: "oneof=a"},
+		{f: []string{"a", "b"}, t: "oneof=a"},
 	}
 
 	for _, spec := range failSpecs {

@@ -275,8 +275,10 @@ func isHTML(fl FieldLevel) bool {
 func isOneOf(fl FieldLevel) bool {
 	vals := parseOneOfParam2(fl.Param())
 
-	field := fl.Field()
+	return isOneOfSearch(fl.Field(), vals, true)
+}
 
+func isOneOfSearch(field reflect.Value, vals []string, search bool) bool {
 	var v string
 	switch field.Kind() {
 	case reflect.String:
@@ -285,6 +287,27 @@ func isOneOf(fl FieldLevel) bool {
 		v = strconv.FormatInt(field.Int(), 10)
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		v = strconv.FormatUint(field.Uint(), 10)
+	case reflect.Array, reflect.Slice:
+		for i := 0; i < field.Len(); i++ {
+			if !isOneOfSearch(field.Index(i), vals, false) {
+				return false
+			}
+		}
+
+		return true
+	case reflect.Map:
+		if search {
+			mapRange := field.MapKeys()
+
+			for i := 0; i < len(mapRange); i++ {
+				if !isOneOfSearch(mapRange[i], vals, false) {
+					return false
+				}
+			}
+			return true
+		} else {
+			return false
+		}
 	default:
 		panic(fmt.Sprintf("Bad field type %T", field.Interface()))
 	}
